@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат с нейросетью</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="loader"></div>
+        <div class="chat-header">
+            <h1>Нейросеть для изучения языков</h1>
+            <p>Новый чат</p>
+        </div>
+        <div class="chat-window" id="chat-window">
+            <div class="message bot-message">
+                <div class="message-content">Здравствуйте! Чем могу помочь?</div>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Ваше сообщение">
+            <button id="send-button"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('send-button').addEventListener('click', async () => {
+            const loader = document.querySelector('.loader'); // Добавляем управление индикатором
+            loader.style.display = 'block'; // Показываем индикатор перед запросом
+
+            const userInput = document.getElementById('user-input').value;
+            if (!userInput) return;
+
+            // Добавляем сообщение пользователя в чат
+            const chatWindow = document.getElementById('chat-window');
+            chatWindow.innerHTML += `
+                <div class="message user-message">
+                    <div class="message-content">${userInput}</div>
+                </div>
+            `;
+
+            // Очищаем поле ввода
+            document.getElementById('user-input').value = '';
+
+            // Отправляем запрос на сервер
+            const response = await fetch('/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ input_text: userInput })
+            });
+
+            // Получаем ответ от сервера
+            const data = await response.json();
+
+            // Добавляем ответ бота в чат
+            chatWindow.innerHTML += `
+                <div class="message bot-message">
+                    <div class="message-content">${data.result}</div>
+                </div>
+            `;
+
+            loader.style.display = 'none'; // Скрываем индикатор после получения ответа
+
+            // Прокручиваем окно чата вниз
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        });
+    </script>
+</body>
+</html>
