@@ -27,9 +27,9 @@ def index():
 
 @app.route("/process", methods=["POST"])
 def process_request():
-    text_input = request.form.get("input_text")
+    input_text = request.json.get('input_text')
     try:
-        result = send_to_gigachat(text_input)
+        result = send_to_gigachat(input_text)
         return jsonify({"result": result})
     except Exception as e:
         return jsonify({"error": str(e)})
