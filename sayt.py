@@ -1,17 +1,18 @@
+import os
+
+from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
 from gigachat import GigaChat
 
 app = Flask(__name__)
-
-CRED = "NDIzMjA4ZTAtNzE3Zi00ZDhkLWFlZTQtNWY2ZGJmZGUyMmZjOmEwOTQ4ODYzLWUxNjktNGRjMy1hOGI5LWEyM2E0YjM0MmJiOQ=="
-SERT_PATH = "/Users/msikanov/Downloads/russiantrustedca/russiantrustedca.pem"
-giga = GigaChat(credentials=CRED, ca_bundle_file=SERT_PATH)
+load_dotenv()
+giga = GigaChat(credentials=os.getenv("CRED"), ca_bundle_file=os.getenv("SERT_PATH"))
 
 
 def send_to_gigachat(message):
     for _ in range(2):
         try:
-            response = giga.chat("привет, как дела?")
+            response = giga.chat(message)
             return response.choices[0].message.content
         except Exception as e:
             print(f"Ошибка при выполнении запроса к GigaChat: {e}")
